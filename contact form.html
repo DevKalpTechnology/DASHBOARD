@@ -52,24 +52,24 @@ input[type=submit]:hover {
 <h3>Contact Form</h3>
 
 <div class="container">
-  <form action="", id="contactform">
+  <form  class="contact-form"  id="contactform">
     <div class="alert">Your message sent..!</div>
     <label for="name">Name</label>
-    <input type="text" id="name" name="name" placeholder="Your name..">
+    <input type="text" class="name" id="name" name="name" placeholder="Your name..">
 
     <label for="mobile">Mobile No.</label>
-    <input type="text" id="mobile" name="mobile" placeholder="Mobile no.">
+    <input type="text"  class="mobile" id="mobile" name="mobile" placeholder="Mobile no.">
 
     <label for="email id">Email ID</label>
-    <input type="text" id="emailid" name="emailid" placeholder="Email Id">
+    <input type="text" class="emailid" id="emailid" name="emailid" placeholder="Email Id">
 
     <label for="message">Message</label>
-    <textarea id="message" name="message" placeholder="Write something.." style="height:200px"></textarea>
+    <textarea  class="message" id="message" name="message" placeholder="Write something.." style="height:200px"></textarea>
 
     <input type="submit" value="Submit">
   </form>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
 <script src="form.js"></script>
 </body>
 </html>

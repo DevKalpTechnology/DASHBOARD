@@ -26,65 +26,63 @@
         </table>
     </div>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
-    <script>
+    <script  id="MainScrpit">
 
     // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAAkYdvOiRzt59TeYU1nTn2h3CymxUyKro",
-            authDomain: "contact-form-bad0d.firebaseapp.com",
-            databaseURL: "https://contact-form-bad0d-default-rtdb.firebaseio.com",
-            projectId: "contact-form-bad0d",
-            storageBucket: "contact-form-bad0d.appspot.com",
-            messagingSenderId: "36932777913",
-            appId: "1:36932777913:web:d2a3bfc62f9e194f14a868"
-        };
+    var firebaseConfig = {
+    apiKey: "AIzaSyCi3j136CE3Vkm-uunG4gtJ4qlfNk6O3q0",
+    authDomain: "testing-100dc.firebaseapp.com",
+    databaseURL: "https://testing-100dc-default-rtdb.firebaseio.com",
+    projectId: "testing-100dc",
+    storageBucket: "testing-100dc.appspot.com",
+    messagingSenderId: "554656015688",
+    appId: "1:554656015688:web:0c39bd5725244132da3f7d"
+  };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
+   // Initialize Firebase
+   firebase.initializeApp(firebaseConfig);
 
 
-    //getting the data 
-        function SelectAllData() {
-            firebase.database().ref('contactform').on('value',
-                function (AllRecords) {
-                    AllRecords.forEach(
-                        function (CurrentRecord) {
-                            var name = CurrentRecord.val().name;
-                            var mobile = CurrentRecord.val().mobile;
-                            var emailid = CurrentRecord.val().emailid;
-                            var message = CurrentRecord.val().message;
-                            AddItemsToTable(name,mobile,  emailid, message);
-                        }
-                    );
-                });
-        }
-        window.onload = SelectAllData;
+     //------------------------------Get All The Data-----------------------------//
+  function SelectAllData(){
+      firebase.database().ref('contactform').once('value',
+      function(AllRecords){
+       AllRecords.forEach(
+         function(CurrentRecord){
+          var name = CurrentRecord.val().name;
+          var mobile = CurrentRecord.val().mobile;
+          var emailid = CurrentRecord.val().emailid;
+          var message = CurrentRecord.val().message;
+          AddItemsToTable(name,mobile, emailid, message); 
+        }  
+       );
+      });
+  }
+  window.onload=SelectAllData;
+  //----------------------filling table----------------//
+    var client=0;
+    function AddItemsToTable(name,mobile, emailid, message){
+        var tbody = document.getElementById('tbody1');
+        var trow = document.createElement('tr');
+        var td1 = document.createElement('td');
+        var td2 = document.createElement('td');
+        var td3 = document.createElement('td');
+        var td4 = document.createElement('td');
+        var td5 = document.createElement('td');
+        td1.innerHTML = ++client;
+        td2.innerHTML = name;
+        td3.innerHTML = mobile;
+        td4.innerHTML = emailid;
+        td5.innerHTML = message;
+        trow.appendChild(td1);
+        trow.appendChild(td2);
+        trow.appendChild(td3);
+        trow.appendChild(td4);
+        trow.appendChild(td5);
+        tbody.appendChild(trow);
 
-//fill the table
-            var client = 0;
-            function AddItemsToTable(name ,mobile,  emailid, message) {
-                var tbody = document.getElementById('tbody1');
-                var trow = document.createElement('tr');
-                var td1 = document.createElement('td');
-                var td2 = document.createElement('td');
-                var td3 = document.createElement('td');
-                var td4 = document.createElement('td');
-                var td5 = document.createElement('td');
-                td1.innerHTML = ++client;
-                td2.innerHTML = name;
-                td3.innerHTML = mobile;
-                td4.innerHTML = emailid;
-                td5.innerHTML = message;
-                trow.appendChild(td1);
-                trow.appendChild(td2);
-                trow.appendChild(td3);
-                trow.appendChild(td4);
-                trow.appendChild(td5);
-                tbody.appendChild(trow);
-
-            }
+    }
     </script>
 </body>
 </html>
