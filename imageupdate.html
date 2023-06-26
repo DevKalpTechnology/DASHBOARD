@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase Image Upload</title>
+    <!-- <script src="./firebase/firebase.js"></script>
+    <script src="./firebase/firebasestorage.js"></script> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet"
+        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="messages.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <style>
+        * {
+            font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+            font-size: 20px;
+        }
+
+        .inp {
+            display: none;
+        }
+
+        .progressBar {
+            width: 250px;
+            background: rgb(196, 193, 193);
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(75deg, rgb(11, 65, 173), rgb(179, 10, 165));
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .img {
+            height: 200px;
+            width: 250px;
+            margin: 5px;
+            border: 1px solid crimson;
+            -o-object-fit: fill;
+            object-fit: fill;
+            display: none;
+        }
+
+        .selectImage {
+            background: crimson;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+        }
+
+        .upload {
+            background: green;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            margin: 10px 0;
+            box-shadow: 0 0 10px 2px rgb(8, 7, 7);
+        }
+
+        .metaData {
+            display: flex;
+        }
+
+        .filedata {
+            background: cadetblue;
+            padding: 10px 15px;
+            font-size: 14px;
+            max-width: 100px;
+            text-overflow: ellipsis;
+            border-radius: 10px;
+            display: none;
+            overflow: hidden;
+            margin: 5px;
+        }
+
+        .images {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .imageUpload {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(360deg, rgb(21, 119, 240), rgb(131, 16, 114));
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .completeMsg {
+            color: white;
+        }
+
+        /*# sourceMappingURL=index.css.map */
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="brand">
+            <span class="lab la-affiliatetheme"></span>
+            <h3>Wankhede Hospital</h3>
+        </div>
+        <div class="sidemenu">
+            <ul>
+                <li><a href="imageupdate.html" class="active">
+                        <span class="las la-home"></span>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li><a href="appointment.html">
+                        <span class="las la-calendar"></span>
+                        <span>Appointment</span>
+                    </a>
+                </li>
+                <li><a href="messages.html">
+                        <span class="las la-envelope"></span>
+                        <span>Mailbox</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="imageUpload">
+        <input type="file" class="inp" onchange="getImageData(event)" multiple />
+        <button onclick="selectImage()" class="selectImage">Select Images</button>
+        <div class="metaData"></div>
+        <div class="progressBar">
+            <div class="progress"></div>
+        </div>
+        <button onclick="uploadImage()" class="upload">Upload</button>
+        <span class="completeMsg"></span>
+        <span class="loading">Loading...</span>
+        <div class="images"></div>
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAynpkdQM2JMzgDLhvt4o-YHV4gThfMXTA",
+            authDomain: "contactform-2001.firebaseapp.com",
+            databaseURL: "https://contactform-2001-default-rtdb.firebaseio.com",
+            projectId: "contactform-2001",
+            storageBucket: "contactform-2001.appspot.com",
+            messagingSenderId: "856373342039",
+            appId: "1:856373342039:web:b28932c8551f8ae4aa1812"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const storage = firebase.storage();
+
+        const inp = document.querySelector(".inp");
+        const progressbar = document.querySelector(".progress");
+        const img = document.querySelector(".img");
+        const body = document.querySelector("body");
+        const metaData = document.querySelector(".metaData");
+        const images = document.querySelector(".images");
+        const loading = document.querySelector(".loading");
+        const imageUpload = document.querySelector(".imageUpload");
+        const completeMsg = document.querySelector(".completeMsg");
+        let file;
+        let files;
+        let fileName;
+        let progress;
+        let uploadedFileName;
+        const selectImage = () => {
+            inp.click();
+        };
+        const getImageData = (e) => {
+            files = e.target.files;
+            for (let i = 0; i < files.length; i++) {
+                let imageData = document.createElement("span");
+                imageData.className = 'filedata';
+                imageData.style.display = 'block';
+                imageData.innerHTML = files[i].name;
+                metaData.appendChild(imageData);
+            }
+        };
+
+        const uploadImage = async () => {
+            for (let i = 0; i < files.length; i++) {
+                let url = await uploadProcess(files[i], Math.round(Math.random() * 9999) + files[i].name);
+                if (url) {
+                    loading.style.display = 'none';
+                    let image = document.createElement("img");
+                    image.style.display = 'block';
+                    image.setAttribute('src', url);
+                    image.className = 'img';
+                    images.appendChild(image);
+                }
+                if (i === files.length - 1) {
+                    completeMsg.innerHTML = `${files.length} files uploaded successfully`;
+                }
+            }
+        };
+
+        const uploadProcess = (file, fileName) => {
+            return new Promise((resolve, reject) => {
+                const storageRef = storage.ref().child("sliderimages");
+                const folderRef = storageRef.child(fileName);
+                const uploadtask = folderRef.put(file);
+                uploadtask.on(
+                    "state_changed",
+                    (snapshot) => {
+                        loading.style.display = 'block';
+                        progress =
+                            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progress = Math.round(progress);
+                        progressbar.style.width = progress + "%";
+                        progressbar.innerHTML = progress + "%";
+                        uploadedFileName = snapshot.ref.name;
+                    },
+                    (error) => {
+                        reject(error);
+                    },
+                    () => {
+                        storage
+                            .ref("sliderimages")
+                            .child(uploadedFileName)
+                            .getDownloadURL()
+                            .then((url) => {
+                                console.log("URL", url);
+                                resolve(url);
+                            });
+                    }
+                );
+            });
+        };
+    </script>
+</body>
+
+</html>
