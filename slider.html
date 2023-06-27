@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Carousel</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .carousel-inner {
+            max-width: 1920px;
+            max-height: 592px;
+            object-fit: contain;
+        }
+
+        .carousel-control-prev-icon,
+        .carousel-control-next-icon {
+            top: 25%;
+        }
+
+        .carousel-indicators {
+            top: 52%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Image Carousel</h1>
+    <div id="carouselExampleIndicators" class="carousel_slide" data-ride="carousel">
+        <ol class="carousel-indicators" id="carouselIndicators"></ol>
+        <div class="carousel-inner" id="carouselInner"></div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-storage.js"></script>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAynpkdQM2JMzgDLhvt4o-YHV4gThfMXTA",
+            authDomain: "contactform-2001.firebaseapp.com",
+            databaseURL: "https://contactform-2001-default-rtdb.firebaseio.com",
+            projectId: "contactform-2001",
+            storageBucket: "contactform-2001.appspot.com",
+            messagingSenderId: "856373342039",
+            appId: "1:856373342039:web:b28932c8551f8ae4aa1812"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        var storage = firebase.storage();
+        var carouselIndicators = document.getElementById("carouselIndicators");
+        var carouselInner = document.getElementById("carouselInner");
+        var currentIndex = 0; // Track the current index of the carousel item
+
+        function retrieveImages() {
+            storage.ref("images").listAll().then(function (result) {
+                result.items.forEach(function (imageRef, index) {
+                    imageRef.getDownloadURL().then(function (url) {
+                        var indicator = document.createElement("li");
+                        indicator.setAttribute("data-target", "#carouselExampleIndicators");
+                        indicator.setAttribute("data-slide-to", index);
+                        if (index === 0) {
+                            indicator.classList.add("active");
+                        }
+                        indicator.addEventListener("click", function () {
+                            goToIndex(index);
+                        });
+                        carouselIndicators.appendChild(indicator);
+
+                        var item = document.createElement("div");
+                        item.classList.add("carousel-item");
+                        if (index === 0) {
+                            item.classList.add("active");
+                        }
+
+                        var image = document.createElement("img");
+                        image.setAttribute("src", url);
+                        image.classList.add("d-block", "w-100");
+
+                        item.appendChild(image);
+                        carouselInner.appendChild(item);
+                    }).catch(function (error) {
+                        console.log("Error retrieving image download URL:", error);
+                    });
+                });
+            }).catch(function (error) {
+                console.log("Error retrieving images:", error);
+            });
+        }
+
+        // Call the retrieveImages function to fetch and display the images
+        retrieveImages();
+
+        function goToIndex(index) {
+            currentIndex = index;
+            var carouselItems = document.getElementsByClassName("carousel-item");
+            for (var i = 0; i < carouselItems.length; i++) {
+                if (i === currentIndex) {
+                    carouselItems[i].classList.add("active");
+                    carouselIndicators.children[i].classList.add("active");
+                } else {
+                    carouselItems[i].classList.remove("active");
+                    carouselIndicators.children[i].classList.remove("active");
+                }
+            }
+        }
+
+        function goToPrevious() {
+            if (currentIndex > 0) {
+                goToIndex(currentIndex - 1);
+            }
+        }
+
+        function goToNext() {
+            var carouselItems = document.getElementsByClassName("carousel-item");
+            if (currentIndex < carouselItems.length - 1) {
+                goToIndex(currentIndex + 1);
+            }
+        }
+
+        // Attach event listeners to the previous and next buttons
+        document.querySelector(".carousel-control-prev").addEventListener("click", goToPrevious);
+        document.querySelector(".carousel-control-next").addEventListener("click", goToNext);
+    </script>
+</body>
+
+</html>
